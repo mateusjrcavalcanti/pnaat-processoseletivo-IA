@@ -85,28 +85,42 @@ projetos/1-classificacao-mnist/
 
 ## 📝 Relatório do Candidato
 
-👤 **Nome Completo:**
+👤 **Nome Completo:** Mateus Junior de Macedo Cavalcanti
 
 ### 1️⃣ Resumo da Arquitetura do Modelo
 
-Descreva, em palavras, a arquitetura da CNN implementada em `train_model.py` (número de blocos convolucionais, uso de batch normalization/dropout, estratégia de validação/early stopping).
+A CNN implementada em [train_model.py](train_model.py) usa três blocos convolucionais com `Conv2D`, `BatchNormalization`, `ReLU` e `MaxPooling2D`, seguida de uma camada de `Dropout` e de uma saída densa com 10 classes e `softmax`. O treinamento foi feito com validação implícita via `validation_split=0.1`, com `EarlyStopping` monitorando `val_loss` para evitar overfitting e preservar o melhor peso do modelo. O `learning_rate=5e-4` foi escolhido para estabilizar o aprendizado em CPU, enquanto o `dropout=0.4` e o `batch_size=128` ajudaram a reduzir overfitting sem tornar o treino excessivamente lento.
 
 ### 2️⃣ Bibliotecas Utilizadas
 
-Liste as principais bibliotecas utilizadas, preferencialmente com suas versões.
+- TensorFlow 2.18.0
+- NumPy
 
 ### 3️⃣ Técnica de Otimização do Modelo
 
-Explique qual técnica foi utilizada para otimizar o modelo em `optimize_model.py`.
+O modelo foi convertido para TensorFlow Lite em [optimize_model.py](optimize_model.py) usando `tf.lite.TFLiteConverter` com `converter.optimizations = [tf.lite.Optimize.DEFAULT]`, o que aplica quantização por intervalo dinâmico para reduzir o tamanho do artefato de edge.
 
 ### 4️⃣ Resultados Obtidos
 
-Informe a acurácia de validação obtida e o tamanho dos arquivos `model.h5` e `model.tflite`.
+- Após a execução do treinamento, a saída mostrou uma acurácia de validação de 0.9710.
+- Após o treino, o arquivo [model.h5](model.h5) foi medido no sistema e apresentou tamanho de 1.065.752 bytes, cerca de 1,02 MB.
+- Após a conversão para TFLite, o arquivo [model.tflite](model.tflite) foi medido no sistema e apresentou tamanho de 89.800 bytes, cerca de 87,70 KB.
+- Ao comparar os dois arquivos, a redução de tamanho foi de 975.952 bytes, o que representa cerca de 91,57% em relação ao modelo original.
 
 ### 5️⃣ Comentários Adicionais (Opcional)
 
-Dificuldades encontradas, decisões técnicas importantes, limitações do modelo, aprendizados durante o desafio.
+Durante o treinamento, a validação inicial mostrou instabilidade, então a combinação de `EarlyStopping`, `dropout` e `learning_rate` mais controlado foi fundamental para manter um treinamento estável em CPU. A principal limitação observada foi que, embora o modelo tenha se comportado bem no MNIST, ele ainda depende de uma arquitetura simples e de um dataset bem delimitado, o que pode limitar a generalização para imagens mais complexas.
 
 ### 6️⃣ Exemplo de Inferência
 
-Cole a saída do terminal ao rodar `run_inference.py` (predito vs. real para as 5+ amostras), e comente brevemente se houve algum caso interessante (acerto ou erro) entre as amostras testadas.
+Saída observada ao rodar [run_inference.py](run_inference.py):
+
+```text
+Amostra 1: predito=7 | real=7
+Amostra 2: predito=2 | real=2
+Amostra 3: predito=1 | real=1
+Amostra 4: predito=0 | real=0
+Amostra 5: predito=4 | real=4
+```
+
+No exemplo executado, as 5 amostras foram classificadas corretamente, já que a saída do [run_inference.py](run_inference.py) mostrou o valor predito e o valor real para cada uma delas e eles coincidiram.

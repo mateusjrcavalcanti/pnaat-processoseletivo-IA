@@ -7,6 +7,7 @@ yolo11n.onnx
 # Python
 __pycache__/
 *.pyc
+.venv
 
 # Ambientes / editores
 .vscode/
